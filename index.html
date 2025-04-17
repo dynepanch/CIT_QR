@@ -1,0 +1,73 @@
+<!DOCTYPE html> 
+<html lang="ja"> 
+<head> 
+  <body bgcolor="#FFE5A">
+  <meta charset="UTF-8"> 
+  <title>出席QRコードジェネレーター</title> 
+  <style> 
+    body { 
+      font-family: Arial, sans-serif; 
+      text-align: center; 
+      padding: 30px; 
+    } 
+    input[type="text"] { 
+      width: 60%; 
+      padding: 10px; 
+      font-size: 16px; 
+    } 
+    button { 
+      padding: 10px 20px; 
+      font-size: 16px; 
+      margin-left: 10px; 
+    } 
+    #qrcode { 
+      margin-top: 20px; 
+    } 
+  </style> 
+</head> 
+<body> 
+  <h1>QRコードジェネレーター</h1> 
+  <p>以下に部屋番号を入力してください</p> 
+  <input type="text" id="numberInput" placeholder="番号を入力"> 
+  <button onclick="generateQRCode()">生成</button> 
+  <center> 
+    <div id="qrcode"></div> 
+  </center> 
+
+  <!-- QRCode.jsのCDN --> 
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script> 
+  <script> 
+    const baseUrl = "https://attendance.is.it-chiba.ac.jp/attendance/class_room/"; 
+
+    // 指定位置に0を挿入
+    function insertZeroAt(str, position) { 
+      return str.slice(0, position) + '0' + str.slice(position); 
+    } 
+
+    function generateQRCode() { 
+      let number = document.getElementById("numberInput").value.trim(); 
+      const container = document.getElementById("qrcode"); 
+      container.innerHTML = ""; // QR表示をクリア
+
+      // 入力が700〜799なら2桁目のあとに0を挿入（例: "701" → "7001"）
+      const num = Number(number);
+      if (!isNaN(num) && num >= 700 && num < 800) {
+        number = insertZeroAt(number, 2);
+      }
+
+      if (number !== "") {
+        const fullUrl = baseUrl + encodeURIComponent(number);
+
+        new QRCode(container, {
+          text: fullUrl,
+          width: 256,
+          height: 256,
+          colorDark: "#000000",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.H
+        });
+      }
+    } 
+  </script> 
+</body> 
+</html>
