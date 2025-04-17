@@ -51,7 +51,7 @@
       const container = document.getElementById("qrcode");  
       const qrLink = document.getElementById("qrLink");
       container.innerHTML = "";  // QR表示をクリア
-
+    
       const num = Number(number);  
       if (!isNaN(num) && num >= 700 && num < 800) {  
         number = insertZeroAt(number, 2);  
