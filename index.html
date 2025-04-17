@@ -1,70 +1,71 @@
-<!DOCTYPE html>  
-<html lang="ja">  
-<head>  
-  <meta charset="UTF-8">  
-  <title>出席QRコードジェネレーター</title>  
-  <style>  
-    body {  
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>出席QRコードジェネレーター</title>
+  <style>
+    body {
       background-color: #FFE5AA;
-      font-family: Arial, sans-serif;  
-      text-align: center;  
-      padding: 30px;  
-    }  
-    input[type="text"] {  
-      width: 60%;  
-      padding: 10px;  
-      font-size: 16px;  
-    }  
-    button {  
-      padding: 10px 20px;  
-      font-size: 16px;  
-      margin-left: 10px;  
-    }  
-    #qrcode {  
-      margin-top: 20px;  
-    }  
-  </style>  
-</head>  
-<body>  
-  <h1>QRコードジェネレーター</h1>  
-  <p>以下に部屋番号を入力してください</p>  
-  <input type="text" id="numberInput" placeholder="番号を入力">  
-  <button onclick="generateQRCode()">生成</button>  
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 30px;
+    }
+    input[type="text"] {
+      width: 60%;
+      padding: 10px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-left: 10px;
+    }
+    #qrcodeWrapper {
+      margin-top: 20px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <h1>QRコードジェネレーター</h1>
+  <p>以下に部屋番号を入力してください</p>
+  <input type="text" id="numberInput" placeholder="番号を入力">
+  <button onclick="generateQRCode()">生成</button>
 
-  <center>  
+  <center>
     <a id="qrLink" href="#" target="_blank">
-      <img id="qrImage" style="margin-top: 20px;" />
-    </a>  
-  </center>  
+      <div id="qrcodeWrapper">
+        <div id="qrcode"></div>
+      </div>
+    </a>
+  </center>
 
-  <!-- QRCode.jsのCDN -->  
-  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>  
-  <script>  
-    const baseUrl = "https://attendance.is.it-chiba.ac.jp/attendance/class_room/";  
+  <!-- QRCode.jsのCDN -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+  <script>
+    const baseUrl = "https://attendance.is.it-chiba.ac.jp/attendance/class_room/";
 
-    function insertZeroAt(str, position) {  
-      return str.slice(0, position) + '0' + str.slice(position);  
-    }  
+    function insertZeroAt(str, position) {
+      return str.slice(0, position) + '0' + str.slice(position);
+    }
 
-    function generateQRCode() {  
-      let number = document.getElementById("numberInput").value.trim();  
+    function generateQRCode() {
+      let number = document.getElementById("numberInput").value.trim();
+      const qrcodeContainer = document.getElementById("qrcode");
       const qrLink = document.getElementById("qrLink");
-      const qrImage = document.getElementById("qrImage");
 
-      // 一時的なQRコード生成用ダミー要素
-      const tempDiv = document.createElement("div");
+      qrcodeContainer.innerHTML = ""; // QR表示をリセット
 
-      const num = Number(number);  
-      if (!isNaN(num) && num >= 700 && num < 800) {  
-        number = insertZeroAt(number, 2);  
-      }  
+      const num = Number(number);
+      if (!isNaN(num) && num >= 700 && num < 800) {
+        number = insertZeroAt(number, 2);
+      }
 
-      if (number !== "") {  
-        const fullUrl = baseUrl + encodeURIComponent(number);  
+      if (number !== "") {
+        const fullUrl = baseUrl + encodeURIComponent(number);
         qrLink.href = fullUrl;
 
-        // QRコードを一時的に生成して画像として抽出
-        const qr = new QRCode(tempDiv, {
+        new QRCode(qrcodeContainer, {
           text: fullUrl,
           width: 256,
           height: 256,
@@ -72,17 +73,8 @@
           colorLight: "#ffffff",
           correctLevel: QRCode.CorrectLevel.H
         });
-
-        // 少し遅延させてcanvas読み取り（非同期生成対策）
-        setTimeout(() => {
-          const canvas = tempDiv.querySelector("canvas");
-          if (canvas) {
-            qrImage.src = canvas.toDataURL("image/png");
-          }
-          tempDiv.innerHTML = ""; // クリーンアップ
-        }, 100);
-      }  
-    }  
-  </script>  
-</body>  
+      }
+    }
+  </script>
+</body>
 </html>
