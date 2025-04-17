@@ -33,7 +33,7 @@
 
   <center>  
     <a id="qrLink" href="#" target="_blank">
-      <div id="qrcode"></div>  
+      <img id="qrImage" style="margin-top: 20px;" />
     </a>  
   </center>  
 
@@ -48,10 +48,12 @@
 
     function generateQRCode() {  
       let number = document.getElementById("numberInput").value.trim();  
-      const container = document.getElementById("qrcode");  
       const qrLink = document.getElementById("qrLink");
-      container.innerHTML = "";  // QR表示をクリア
-    
+      const qrImage = document.getElementById("qrImage");
+
+      // 一時的なQRコード生成用ダミー要素
+      const tempDiv = document.createElement("div");
+
       const num = Number(number);  
       if (!isNaN(num) && num >= 700 && num < 800) {  
         number = insertZeroAt(number, 2);  
@@ -59,16 +61,26 @@
 
       if (number !== "") {  
         const fullUrl = baseUrl + encodeURIComponent(number);  
-        qrLink.href = fullUrl;  // クリック時のリンク設定
+        qrLink.href = fullUrl;
 
-        new QRCode(container, {  
-          text: fullUrl,  
-          width: 256, 
+        // QRコードを一時的に生成して画像として抽出
+        const qr = new QRCode(tempDiv, {
+          text: fullUrl,
+          width: 256,
           height: 256,
-          colorDark: "#000000", 
+          colorDark: "#000000",
           colorLight: "#ffffff",
-          correctLevel: QRCode.CorrectLevel.H  
-        });  
+          correctLevel: QRCode.CorrectLevel.H
+        });
+
+        // 少し遅延させてcanvas読み取り（非同期生成対策）
+        setTimeout(() => {
+          const canvas = tempDiv.querySelector("canvas");
+          if (canvas) {
+            qrImage.src = canvas.toDataURL("image/png");
+          }
+          tempDiv.innerHTML = ""; // クリーンアップ
+        }, 100);
       }  
     }  
   </script>  
